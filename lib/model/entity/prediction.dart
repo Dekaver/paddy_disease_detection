@@ -2,14 +2,20 @@ import 'package:floor/floor.dart';
 
 @entity
 class Prediction {
-  @primaryKey
-  final int id;
+  @PrimaryKey(autoGenerate: true)
+  final int? id;
   final String name;
-  final String path;
-  final String score;
-  final String time;
+  final String image;
+  final double score;
+  final double time;
   final String category;
   
 
-  Prediction(this.id, this.name, this.path, this.score, this.time, this.category);
+  Prediction(this.id, this.name, this.image, this.score, this.time, this.category);
+
+   @override
+  String toString() {
+    return 'Prediction{id: $id, name: $name, path: $image, score: $score, time: $time, category: $category}';
+  }
+
 }

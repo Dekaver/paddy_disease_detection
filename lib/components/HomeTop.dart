@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:paddy_disease_detection/components/Clipper.dart';
-import 'package:paddy_disease_detection/main.dart';
 
 class HomeTop extends StatefulWidget {
+  const HomeTop({Key? key}) : super(key: key);
+
   @override
   _HomeTop createState() => _HomeTop();
 }
@@ -20,10 +21,10 @@ class _HomeTop extends State<HomeTop> {
           child: Container(
             height: height * .40 < 320 ? height * .40 : 300, //400
             //color: Colors.tealAccent,
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
                 gradient: LinearGradient(colors: [
-              appTheme.primaryColor,
-              appTheme.secondaryHeaderColor
+              Color.fromARGB(255, 57, 176, 39),
+              Color.fromARGB(255, 243, 219, 33)
             ])),
             child: Column(
               children: <Widget>[

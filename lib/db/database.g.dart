@@ -82,7 +82,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Prediction` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `path` TEXT NOT NULL, `score` TEXT NOT NULL, `time` TEXT NOT NULL, `category` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Prediction` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `image` TEXT NOT NULL, `score` REAL NOT NULL, `time` REAL NOT NULL, `category` TEXT NOT NULL, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -105,7 +105,20 @@ class _$PredictionDao extends PredictionDao {
             (Prediction item) => <String, Object?>{
                   'id': item.id,
                   'name': item.name,
-                  'path': item.path,
+                  'image': item.image,
+                  'score': item.score,
+                  'time': item.time,
+                  'category': item.category
+                },
+            changeListener),
+        _predictionDeletionAdapter = DeletionAdapter(
+            database,
+            'Prediction',
+            ['id'],
+            (Prediction item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'image': item.image,
                   'score': item.score,
                   'time': item.time,
                   'category': item.category
@@ -120,16 +133,32 @@ class _$PredictionDao extends PredictionDao {
 
   final InsertionAdapter<Prediction> _predictionInsertionAdapter;
 
+  final DeletionAdapter<Prediction> _predictionDeletionAdapter;
+
   @override
   Future<List<Prediction>> findAllPredictions() async {
     return _queryAdapter.queryList('SELECT * FROM Prediction',
         mapper: (Map<String, Object?> row) => Prediction(
             row['id'] as int,
             row['name'] as String,
-            row['path'] as String,
-            row['score'] as String,
-            row['time'] as String,
+            row['image'] as String,
+            row['score'] as double,
+            row['time'] as double,
             row['category'] as String));
+  }
+
+  @override
+  Stream<List<Prediction>> findAllPredictionsAsStream() {
+    return _queryAdapter.queryListStream('SELECT * FROM Prediction',
+        mapper: (Map<String, Object?> row) => Prediction(
+            row['id'] as int,
+            row['name'] as String,
+            row['image'] as String,
+            row['score'] as double,
+            row['time'] as double,
+            row['category'] as String),
+        queryableName: 'Prediction',
+        isView: false);
   }
 
   @override
@@ -138,9 +167,9 @@ class _$PredictionDao extends PredictionDao {
         mapper: (Map<String, Object?> row) => Prediction(
             row['id'] as int,
             row['name'] as String,
-            row['path'] as String,
-            row['score'] as String,
-            row['time'] as String,
+            row['image'] as String,
+            row['score'] as double,
+            row['time'] as double,
             row['category'] as String),
         arguments: [id],
         queryableName: 'Prediction',
@@ -148,7 +177,13 @@ class _$PredictionDao extends PredictionDao {
   }
 
   @override
-  Future<void> insertPrediction(Prediction person) async {
-    await _predictionInsertionAdapter.insert(person, OnConflictStrategy.abort);
+  Future<void> insertPrediction(Prediction prediction) async {
+    await _predictionInsertionAdapter.insert(
+        prediction, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deletePrediction(Prediction prediction) async {
+    await _predictionDeletionAdapter.delete(prediction);
   }
 }
