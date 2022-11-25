@@ -7,17 +7,19 @@ class Deals extends StatelessWidget {
 
   const Deals({Key? key, required this.dao}) : super(key: key);
 
-
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: Column(
-        children: <Widget>[
-          const Text("data"),
-          PredictionsListView(
-            dao: dao,
-          ),
-        ],
+    return Scaffold(
+      body: SingleChildScrollView(
+        scrollDirection: Axis.vertical,
+        child: Column(
+          children: <Widget>[
+            const Text("data"),
+            PredictionsListView(
+              dao: dao,
+            ),
+          ],
+        ),
       ),
     );
   }

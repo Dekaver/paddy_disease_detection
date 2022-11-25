@@ -57,8 +57,6 @@ abstract class Classifier {
       _outputShape = interpreter.getOutputTensor(0).shape;
       _inputType = interpreter.getInputTensor(0).type;
       _outputType = interpreter.getOutputTensor(0).type;
-      print(_outputShape);
-      print(_inputType);
 
       _outputBuffer = TensorBuffer.createFixedSize(_outputShape, _outputType);
       _probabilityProcessor =

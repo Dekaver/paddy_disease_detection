@@ -58,11 +58,13 @@ class _ImageFileState extends State<ImageFile> {
     setState(() {
       prediction = pred.label;
       percent = double.parse((pred.score * 100).toStringAsFixed(4));
+      print(percent);
       category = pred;
     });
   }
 
-  void _savePredict(int? id, String name, String image, double score, double time, String category) async {
+  void _savePredict(int? id, String name, String image, double score,
+      double time, String category) async {
     final pred = Prediction(id, name, image, score, time, category);
     await widget.dao.insertPrediction(pred);
     final res = await widget.dao.findPredictionById(1);
@@ -147,6 +149,19 @@ class _ImageFileState extends State<ImageFile> {
                   backgroundColor: MaterialStateProperty.resolveWith(
                       (states) => Colors.grey.shade200),
                 ),
+                onPressed: () async {
+                  List<int> imageBytes = imageFile.readAsBytesSync();
+                  String base64Image = base64Encode(imageBytes);
+                  _savePredict(
+                      null, 'name', base64Image, percent, time, prediction);
+                },
+                child: const Text('Save'),
+              ),
+              TextButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith(
+                      (states) => Colors.grey.shade200),
+                ),
                 onPressed: () {
                   final pres = DateTime.now().millisecondsSinceEpoch;
                   _predict();
@@ -157,122 +172,6 @@ class _ImageFileState extends State<ImageFile> {
                 },
                 child: const Text('Scan'),
               )
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Column(
-                children: [
-                  ClipRRect(
-                      borderRadius: const BorderRadius.all(Radius.circular(20)),
-                      child: Stack(
-                        children: <Widget>[
-                          Container(
-                            height: height * .137 < 160 ? height * .137 : 160,
-                            width: width * .5 < 250 ? width * .5 : 250,
-                            child: (takePicture)
-                                ? RotatedBox(
-                                    quarterTurns: 1,
-                                    child:
-                                        Image.file(imageFile, fit: BoxFit.fill))
-                                : const SizedBox(
-                                    child: Center(
-                                      child: Text("No Image"),
-                                    ),
-                                  ),
-                            // decoration: BoxDecoration(
-                            //     image: DecorationImage(
-                            //         image: AssetImage("assets/images/Kerman.png"),
-                            //         fit: BoxFit.fill)),
-                          ),
-                          Positioned(
-                            height: 60,
-                            width: width * .5 < 250 ? width * .5 : 250,
-                            left: 0,
-                            //right: 0,
-                            bottom: 0,
-                            child: Container(
-                              decoration: const BoxDecoration(
-                                  gradient: LinearGradient(
-                                      colors: [Colors.black, Colors.black12],
-                                      begin: Alignment.bottomCenter,
-                                      end: Alignment.topCenter)),
-                            ),
-                          ),
-                          Positioned(
-                            child: Row(
-                              mainAxisSize: MainAxisSize.max,
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: <Widget>[
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  //decoration: BoxDecoration(
-                                  //   shape: BoxShape.rectangle,
-                                  //   color: Colors.black.withOpacity(.4),
-                                  //  borderRadius: BorderRadius.all(Radius.circular(10))
-                                  // ),
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: <Widget>[
-                                      Text(
-                                        prediction,
-                                        style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white),
-                                      ),
-                                      Text(
-                                        date,
-                                        style: const TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: FontWeight.w400,
-                                            color: Colors.white),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 8, vertical: 2),
-                                  decoration: const BoxDecoration(
-                                      shape: BoxShape.rectangle,
-                                      color: Colors.white,
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(10))),
-                                  child: Text(
-                                    "$percent %",
-                                    style: const TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black),
-                                  ),
-                                )
-                              ],
-                            ),
-                            left: 10,
-                            bottom: 10,
-                            right: 15,
-                          )
-                        ],
-                      )),
-                  TextButton(
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.resolveWith(
-                          (states) => Colors.grey.shade200),
-                    ),
-                    onPressed: () async {
-                      List<int> imageBytes = imageFile.readAsBytesSync();
-                      String base64Image = base64Encode(imageBytes);
-                      _savePredict(
-                          null, 'name', base64Image, percent, time, prediction);
-                    },
-                    child: const Text('Save'),
-                  ),
-                ],
-              ),
             ],
           ),
         ],
