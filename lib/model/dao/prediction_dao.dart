@@ -12,6 +12,9 @@ abstract class PredictionDao {
   @Query('SELECT * FROM Prediction WHERE id = :id')
   Stream<Prediction?> findPredictionById(int id);
 
+  @Query('SELECT * FROM Prediction WHERE category = :category')
+  Stream<List<Prediction>> findPredictionByCategory(String category);
+
   @insert
   Future<void> insertPrediction(Prediction prediction);
 

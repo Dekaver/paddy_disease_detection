@@ -177,6 +177,22 @@ class _$PredictionDao extends PredictionDao {
   }
 
   @override
+  Stream<List<Prediction>> findPredictionByCategory(String category) {
+    return _queryAdapter.queryListStream(
+        'SELECT * FROM Prediction WHERE category = ?1',
+        mapper: (Map<String, Object?> row) => Prediction(
+            row['id'] as int,
+            row['name'] as String,
+            row['image'] as String,
+            row['score'] as double,
+            row['time'] as double,
+            row['category'] as String),
+        arguments: [category],
+        queryableName: 'Prediction',
+        isView: false);
+  }
+
+  @override
   Future<void> insertPrediction(Prediction prediction) async {
     await _predictionInsertionAdapter.insert(
         prediction, OnConflictStrategy.abort);

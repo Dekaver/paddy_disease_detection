@@ -6,28 +6,32 @@ import 'package:paddy_disease_detection/Core/classifier_quant.dart';
 import 'package:paddy_disease_detection/Core/classify.dart';
 import 'package:paddy_disease_detection/model/entity/prediction.dart';
 import 'package:paddy_disease_detection/model/dao/prediction_dao.dart';
-import 'package:paddy_disease_detection/screen/Camera.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart' as helper;
 import 'package:intl/intl.dart';
 import 'package:image/image.dart' as img;
 
 class ImageFile extends StatefulWidget {
+  static const routeName = '/image';
+
   final PredictionDao dao;
-  const ImageFile({Key? key, required this.dao}) : super(key: key);
+  final String path;
+  const ImageFile({
+    Key? key,
+    required this.dao,
+    required this.path,
+  }) : super(key: key);
 
   @override
   State<ImageFile> createState() => _ImageFileState();
 }
 
 class _ImageFileState extends State<ImageFile> {
-  File? _image;
+  late File imageFile;
   late Classifier _classifier;
   helper.Category? category;
   bool takePicture = false;
   String path = '';
-  File imageFile = File('assets/images/Kerman.png');
   ImagePicker picker = ImagePicker();
-
   var date = "";
   double time = 0;
   String prediction = "";
@@ -36,8 +40,10 @@ class _ImageFileState extends State<ImageFile> {
 
   @override
   void initState() {
+    print(widget.path);
     super.initState();
     _classifier = ClassifierQuant(numThreads: 3);
+    imageFile = File(widget.path);
   }
 
   @override
@@ -51,7 +57,7 @@ class _ImageFileState extends State<ImageFile> {
   }
 
   void _predict() async {
-    img.Image imageInput = img.decodeImage(_image!.readAsBytesSync())!;
+    img.Image imageInput = img.decodeImage(imageFile.readAsBytesSync())!;
     var pred = _classifier.predict(imageInput);
     // print(pred.label);
     // print(pred.score);
@@ -78,104 +84,120 @@ class _ImageFileState extends State<ImageFile> {
     var formatter = DateFormat('dd-mm-yyyy');
     String datenow = formatter.format(now);
 
-    return Container(
-      margin: const EdgeInsets.all(10),
-      child: ListView(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.only(top: 5),
-                width: 300,
-                height: 450,
-                color: Colors.grey.shade200,
-                child: (takePicture)
-                    ? Image.file(imageFile)
-                    : const SizedBox(
-                        child: Center(
-                          child: Text("No Image"),
-                        ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.green,
+      ),
+      body: Container(
+        margin: const EdgeInsets.all(10),
+        child: ListView(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                    margin: const EdgeInsets.only(top: 5),
+                    width: 300,
+                    height: 450,
+                    color: Colors.grey.shade200,
+                    child: Image.file(File(widget.path))),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: EdgeInsets.only(top: 20, bottom: 20),
+                  width: 300,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 96,
+                            child: Text("Prediction : "),
+                          ),
+                          Container(
+                            width: 200,
+                            child: Text(prediction),
+                          ),
+                        ],
                       ),
-              ),
-            ],
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith(
-                      (states) => Colors.grey.shade200),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 96,
+                            child: Text("Accuracy : "),
+                          ),
+                          Container(
+                            width: 200,
+                            child: Text(percent.toString() + "%"),
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: <Widget>[
+                          Container(
+                            width: 96,
+                            child: Text("Time : "),
+                          ),
+                          Container(
+                            width: 200,
+                            child: Text(time.toString()+ 'ms'),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
                 ),
-                onPressed: () async {
-                  path = (await Navigator.push<String?>(context,
-                      MaterialPageRoute(builder: (_) => const CameraPage())))!;
-                  setState(() {
-                    if (path != '') {
-                      imageFile = File(path);
-                      _image = imageFile;
-                      takePicture = true;
-                    } else {
-                      takePicture = false;
-                    }
-                  });
-                },
-                child: const Text('Camera'),
-              ),
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith(
-                      (states) => Colors.grey.shade200),
+              ],
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => Colors.grey.shade200),
+                  ),
+                  onPressed: () async {
+                    List<int> imageBytes = imageFile.readAsBytesSync();
+                    String base64Image = base64Encode(imageBytes);
+                    _savePredict(
+                        null, 'name', base64Image, percent, time, prediction);
+                  },
+                  child: const Text('Save'),
                 ),
-                onPressed: () async {
-                  XFile? fileimage =
-                      await picker.pickImage(source: ImageSource.gallery);
-                  setState(() {
-                    if (fileimage?.path != null) {
-                      path = fileimage!.path;
-                      imageFile = File(path);
-                      _image = imageFile;
-                      takePicture = true;
-                    } else {
-                      takePicture = false;
-                    }
-                  });
-                },
-                child: const Text('Galery'),
-              ),
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith(
-                      (states) => Colors.grey.shade200),
-                ),
-                onPressed: () async {
-                  List<int> imageBytes = imageFile.readAsBytesSync();
-                  String base64Image = base64Encode(imageBytes);
-                  _savePredict(
-                      null, 'name', base64Image, percent, time, prediction);
-                },
-                child: const Text('Save'),
-              ),
-              TextButton(
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith(
-                      (states) => Colors.grey.shade200),
-                ),
-                onPressed: () {
-                  final pres = DateTime.now().millisecondsSinceEpoch;
-                  _predict();
-                  final pre = DateTime.now().millisecondsSinceEpoch - pres;
-                  setState(() {
-                    time = pre.toDouble();
-                  });
-                },
-                child: const Text('Scan'),
-              )
-            ],
-          ),
-        ],
+                TextButton(
+                  style: ButtonStyle(
+                    backgroundColor: MaterialStateProperty.resolveWith(
+                        (states) => Colors.grey.shade200),
+                  ),
+                  onPressed: () {
+                    final pres = DateTime.now().millisecondsSinceEpoch;
+                    _predict();
+                    final pre = DateTime.now().millisecondsSinceEpoch - pres;
+                    setState(() {
+                      time = pre.toDouble();
+                    });
+                  },
+                  child: const Text('Scan'),
+                )
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
+}
+
+class ImageScreenArguments {
+  final PredictionDao dao;
+  final String path;
+
+  ImageScreenArguments({required this.dao, required this.path});
 }

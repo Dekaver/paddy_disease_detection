@@ -9,8 +9,8 @@ class ClassifierQuant extends Classifier {
   String get modelName => 'model.tflite';
 
   @override
-  NormalizeOp get preProcessNormalizeOp => NormalizeOp(0, 1);
+  NormalizeOp get preProcessNormalizeOp => NormalizeOp(0, 255);
 
   @override
-  NormalizeOp get postProcessNormalizeOp => NormalizeOp(0, 160);
+  NormalizeOp get postProcessNormalizeOp => NormalizeOp(0, 1);
 }

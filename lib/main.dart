@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:paddy_disease_detection/components/BottomNavigationBar.dart';
 import 'package:paddy_disease_detection/model/dao/prediction_dao.dart';
+import 'package:paddy_disease_detection/screen/Camera.dart';
+import 'package:paddy_disease_detection/screen/Detail.dart';
 import 'package:paddy_disease_detection/screen/home.dart';
-import 'screen/Deals.dart';
+import 'screen/Data.dart';
 import 'screen/Image.dart';
 import 'db/database.dart';
 
@@ -26,22 +28,43 @@ class PaddyPredictionApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: BottomNav(
-          appTheme: ThemeData(
-              primaryColor: const Color.fromARGB(255, 57, 176, 39),
-              secondaryHeaderColor: const Color.fromARGB(255, 243, 219, 33)),
-          sel: 0,
-          bodies: [
-            HomeScreen(dao: dao),
-            ImageFile(dao: dao),
-            Deals(dao: dao),
-            PredictionsListView(dao: dao),
-            // const ScanPage()
-          ]),
       theme: ThemeData(
           primaryColor: const Color.fromARGB(255, 57, 176, 39),
           secondaryHeaderColor: const Color.fromARGB(255, 243, 219, 33)),
       title: "Paddy Disease Prediction",
+      initialRoute: '/',
+      routes: {
+        '/': (context) => HomeScreen(dao: dao),
+        '/camera': (context) => CameraPage(dao: dao),
+        '/data': (context) => Data(dao: dao),
+        // '/detail': (context) => Detail(dao: dao),
+      },
+      onGenerateRoute: (settings) {
+        // If you push the PassArguments route
+        if (settings.name == ImageFile.routeName) {
+          final args = settings.arguments as ImageScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return ImageFile(
+                dao: args.dao,
+                path: args.path,
+              );
+            },
+          );
+        }
+        if (settings.name == DetailPage.routeName) {
+          final args = settings.arguments as DetailScreenArguments;
+          return MaterialPageRoute(
+            builder: (context) {
+              return DetailPage(
+                prediction: args.prediction,
+              );
+            },
+          );
+        }
+        assert(false, 'Need to implement ${settings.name}');
+        return null;
+      },
     );
   }
 }
