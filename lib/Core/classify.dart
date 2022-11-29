@@ -26,6 +26,8 @@ abstract class Classifier {
 
   final int _labelsLength = 3;
 
+  bool done = false;
+
   late dynamic _probabilityProcessor;
 
   late List<String> labels;
@@ -42,8 +44,6 @@ abstract class Classifier {
       _interpreterOptions.threads = numThreads;
       _interpreterOptions.useNnApiForAndroid = true;
     }
-
-    loadModel();
     loadLabels();
   }
 
@@ -61,6 +61,7 @@ abstract class Classifier {
       _outputBuffer = TensorBuffer.createFixedSize(_outputShape, _outputType);
       _probabilityProcessor =
           TensorProcessorBuilder().add(postProcessNormalizeOp).build();
+      done = true;
     } catch (e) {
       print('Unable to create interpreter, Caught Exception: ${e.toString()}');
     }
@@ -89,25 +90,25 @@ abstract class Classifier {
   }
 
   Category predict(Image _image) {
-    final pres = DateTime.now().millisecondsSinceEpoch;
+    // final pres = DateTime.now().millisecondsSinceEpoch;
     _inputImage = TensorImage(_inputType!);
     _inputImage.loadImage(_image);
     _inputImage = _preProcess();
-    final pre = DateTime.now().millisecondsSinceEpoch - pres;
+    // final pre = DateTime.now().millisecondsSinceEpoch - pres;
 
-    print('Time to load image: $pre ms');
+    // print('Time to load image: $pre ms');
 
-    final runs = DateTime.now().millisecondsSinceEpoch;
+    // final runs = DateTime.now().millisecondsSinceEpoch;
     interpreter.run(_inputImage.buffer, _outputBuffer.getBuffer());
-    final run = DateTime.now().millisecondsSinceEpoch - runs;
+    // final run = DateTime.now().millisecondsSinceEpoch - runs;
 
-    print('Time to run inference: $run ms');
+    // print('Time to run inference: $run ms');
 
     Map<String, double> labeledProb = TensorLabel.fromList(
             labels, _probabilityProcessor.process(_outputBuffer))
         .getMapWithFloatValue();
     final pred = getTopProbability(labeledProb);
-    print(labeledProb);
+    // print(labeledProb);
     return Category(pred.key, pred.value);
   }
 

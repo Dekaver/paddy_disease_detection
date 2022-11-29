@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:paddy_disease_detection/model/dao/prediction_dao.dart';
 import 'package:paddy_disease_detection/screen/Image.dart';
+import 'package:flutter/services.dart';
 
 late List<CameraDescription> cameras;
 
@@ -34,6 +35,14 @@ class _CameraPageState extends State<CameraPage> {
     super.dispose();
   }
 
+  @override
+  void initState() {
+    super.initState();
+    SystemChrome.setPreferredOrientations([
+      DeviceOrientation.portraitUp,
+    ]);
+  }
+
   Future<String?> takePicture() async {
     try {
       XFile file = await cameraController.takePicture();
@@ -45,6 +54,7 @@ class _CameraPageState extends State<CameraPage> {
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.height);
     return Scaffold(
       backgroundColor: Colors.black,
       body: FutureBuilder(
@@ -58,7 +68,8 @@ class _CameraPageState extends State<CameraPage> {
                       Container(
                         margin: const EdgeInsets.fromLTRB(30, 70, 30, 0),
                         width: MediaQuery.of(context).size.width,
-                        height: MediaQuery.of(context).size.height /
+                        height: MediaQuery.of(context).size.height *
+                            0.9 /
                             cameraController.value.aspectRatio,
                         child: path == ''
                             ? CameraPreview(cameraController)

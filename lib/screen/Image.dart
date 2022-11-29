@@ -7,7 +7,6 @@ import 'package:paddy_disease_detection/Core/classify.dart';
 import 'package:paddy_disease_detection/model/entity/prediction.dart';
 import 'package:paddy_disease_detection/model/dao/prediction_dao.dart';
 import 'package:tflite_flutter_helper/tflite_flutter_helper.dart' as helper;
-import 'package:intl/intl.dart';
 import 'package:image/image.dart' as img;
 
 class ImageFile extends StatefulWidget {
@@ -29,21 +28,35 @@ class _ImageFileState extends State<ImageFile> {
   late File imageFile;
   late Classifier _classifier;
   helper.Category? category;
-  bool takePicture = false;
-  String path = '';
-  ImagePicker picker = ImagePicker();
-  var date = "";
   double time = 0;
   String prediction = "";
   double percent = 0;
   // String? _retrieveDataError;
 
+  void _predict() async {
+    await _classifier.loadModel();
+    if (_classifier.done) {
+      final pres = DateTime.now().millisecondsSinceEpoch;
+      img.Image imageInput = img.decodeImage(imageFile.readAsBytesSync())!;
+      var pred = _classifier.predict(imageInput);
+      final pre = DateTime.now().millisecondsSinceEpoch - pres;
+      setState(() {
+        prediction = pred.label;
+        percent = double.parse((pred.score * 100).toStringAsFixed(4));
+        category = pred;
+        time = pre.toDouble();
+      });
+    }
+    ;
+  }
+
   @override
   void initState() {
-    print(widget.path);
     super.initState();
+    print(widget.path);
     _classifier = ClassifierQuant(numThreads: 3);
     imageFile = File(widget.path);
+    _predict();
   }
 
   @override
@@ -56,34 +69,15 @@ class _ImageFileState extends State<ImageFile> {
     super.dispose();
   }
 
-  void _predict() async {
-    img.Image imageInput = img.decodeImage(imageFile.readAsBytesSync())!;
-    var pred = _classifier.predict(imageInput);
-    // print(pred.label);
-    // print(pred.score);
-    setState(() {
-      prediction = pred.label;
-      percent = double.parse((pred.score * 100).toStringAsFixed(4));
-      print(percent);
-      category = pred;
-    });
-  }
-
   void _savePredict(int? id, String name, String image, double score,
       double time, String category) async {
     final pred = Prediction(id, name, image, score, time, category);
     await widget.dao.insertPrediction(pred);
-    final res = await widget.dao.findPredictionById(1);
+    // final res = await widget.dao.findPredictionById(1);
   }
 
   @override
   Widget build(BuildContext context) {
-    var height = MediaQuery.of(context).size.longestSide;
-    var width = MediaQuery.of(context).size.width;
-    DateTime now = DateTime.now();
-    var formatter = DateFormat('dd-mm-yyyy');
-    String datenow = formatter.format(now);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.green,
@@ -146,7 +140,7 @@ class _ImageFileState extends State<ImageFile> {
                           ),
                           Container(
                             width: 200,
-                            child: Text(time.toString()+ 'ms'),
+                            child: Text(time.toString() + 'ms'),
                           ),
                         ],
                       ),
@@ -158,34 +152,27 @@ class _ImageFileState extends State<ImageFile> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith(
-                        (states) => Colors.grey.shade200),
+                SizedBox(
+                  width: 300,
+                  child: TextButton(
+                    style: ButtonStyle(
+                      backgroundColor: MaterialStateProperty.resolveWith(
+                          (states) => Colors.green.shade200),
+                    ),
+                    onPressed: () async {
+                      List<int> imageBytes = imageFile.readAsBytesSync();
+                      String base64Image = base64Encode(imageBytes);
+                      String name =
+                          DateTime.now().millisecondsSinceEpoch.toString();
+                      _savePredict(null, "PREDICTION_" + name, base64Image,
+                          percent, time, prediction);
+                    },
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(color: Colors.black),
+                    ),
                   ),
-                  onPressed: () async {
-                    List<int> imageBytes = imageFile.readAsBytesSync();
-                    String base64Image = base64Encode(imageBytes);
-                    _savePredict(
-                        null, 'name', base64Image, percent, time, prediction);
-                  },
-                  child: const Text('Save'),
                 ),
-                TextButton(
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.resolveWith(
-                        (states) => Colors.grey.shade200),
-                  ),
-                  onPressed: () {
-                    final pres = DateTime.now().millisecondsSinceEpoch;
-                    _predict();
-                    final pre = DateTime.now().millisecondsSinceEpoch - pres;
-                    setState(() {
-                      time = pre.toDouble();
-                    });
-                  },
-                  child: const Text('Scan'),
-                )
               ],
             ),
           ],

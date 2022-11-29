@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:paddy_disease_detection/components/BottomNavigationBar.dart';
 import 'package:paddy_disease_detection/model/dao/prediction_dao.dart';
+import 'package:paddy_disease_detection/screen/About.dart';
 import 'package:paddy_disease_detection/screen/Camera.dart';
 import 'package:paddy_disease_detection/screen/Detail.dart';
 import 'package:paddy_disease_detection/screen/home.dart';
@@ -37,7 +38,7 @@ class PaddyPredictionApp extends StatelessWidget {
         '/': (context) => HomeScreen(dao: dao),
         '/camera': (context) => CameraPage(dao: dao),
         '/data': (context) => Data(dao: dao),
-        // '/detail': (context) => Detail(dao: dao),
+        '/about': (context) => AboutPage(),
       },
       onGenerateRoute: (settings) {
         // If you push the PassArguments route

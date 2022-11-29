@@ -19,115 +19,132 @@ class PredictionListCell extends StatelessWidget {
     var height = MediaQuery.of(context).size.longestSide;
     return Column(
       children: <Widget>[
-        ClipRRect(
-            borderRadius: const BorderRadius.all(Radius.circular(20)),
-            child: Stack(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  child: Container(
-                      height: height * .137 < 160 ? height * .137 : 160,
-                      width: width * .5 < 250 ? width * .5 : 250,
-                      child: Image.memory(
-                        const Base64Decoder().convert(prediction.image),
-                        fit: BoxFit.cover,
-                      )
-                      // decoration: const BoxDecoration(
-                      //     image: DecorationImage(
-                      //       image: AssetImage(""),
-                      //         fit: BoxFit.fill)),
-                      ),
-                ),
-                Positioned(
-                  height: 60,
-                  width: width * .5 < 250 ? width * .5 : 250,
-                  left: 5,
-                  //right: 0,
-                  bottom: 0,
-                  child: Container(
-                    decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                            colors: [Colors.black, Colors.black12],
-                            begin: Alignment.bottomCenter,
-                            end: Alignment.topCenter)),
+        Container(
+          padding: EdgeInsets.all(3),
+          child: ClipRRect(
+              borderRadius: const BorderRadius.all(Radius.circular(10)),
+              child: Stack(
+                alignment: AlignmentDirectional.bottomStart,
+                children: <Widget>[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 0),
+                    child: Container(
+                        padding: EdgeInsets.all(0),
+                        height: height * .137 < 160 ? height * .137 : 160,
+                        width: width * .5 < 250 ? width * .5 : 250,
+                        child: Image.memory(
+                          const Base64Decoder().convert(prediction.image),
+                          fit: BoxFit.cover,
+                          alignment: AlignmentDirectional.center,
+                          opacity: AlwaysStoppedAnimation<double>(1),
+                        )),
                   ),
-                ),
-                Positioned(
-                  child: Row(
-                    mainAxisSize: MainAxisSize.max,
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: Colors.black.withOpacity(.4),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            Text(
-                              prediction.name,
-                              style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white),
-                            ),
-                            Text(
-                              prediction.category,
-                              style: const TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                  color: Colors.white),
-                            ),
+                  Positioned(
+                    height: 30,
+                    width: width * .5 < 250 ? width * .5 : 250,
+                    left: 0,
+                    //right: 0,
+                    bottom: 0,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [Color.fromARGB(100, 0, 0, 0), Color.fromARGB(100, 0, 0, 0)],
+                              begin: Alignment.bottomCenter,
+                              end: Alignment.topCenter)),
+                    ),
+                  ),
+                  Positioned(
+                    height: 30,
+                    width: width * .5 < 250 ? width * .5 : 250,
+                    left: 0,
+                    top: 0,
+                    child: Container(
+                      decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                              colors: [
+                            Color.fromARGB(100, 0, 0, 0),
+                            Color.fromARGB(100, 0, 0, 0)
                           ],
-                        ),
-                      ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 2),
-                        decoration: const BoxDecoration(
-                            shape: BoxShape.rectangle,
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(10))),
-                        child: Text(
-                          prediction.score.toString() + "%",
-                          style: const TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                              color: Colors.black),
-                        ),
-                      )
-                    ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter)),
+                    ),
                   ),
-                  left: 10,
-                  bottom: 10,
-                  right: 15,
-                )
-              ],
-            )),
-        // Row(
-        //   mainAxisSize: MainAxisSize.max,
-        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        //   children: <Widget>[
-        //     Text('${(newprice)}',
-        //         style: const TextStyle(
-        //             color: Colors.black,
-        //             fontWeight: FontWeight.bold,
-        //             fontStyle: FontStyle.italic)),
-        //     SizedBox(
-        //       width: width * 0.08,
-        //     ),
-        //     Text('${(oldprice)}',
-        //         style: const TextStyle(
-        //             color: Colors.black87,
-        //             fontWeight: FontWeight.w400,
-        //             fontStyle: FontStyle.italic)),
-        //   ],
-        // )
+                  Positioned(
+                    height: 20,
+                    left: 10,
+                    top: 3,
+                    child: Container(
+                      padding:
+                          const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      // decoration: BoxDecoration(
+                      //     shape: BoxShape.rectangle,
+                      //     color: Colors.black.withOpacity(.8),
+                      //     borderRadius: BorderRadius.all(Radius.circular(2))),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            prediction.name,
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.white),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: <Widget>[
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.black.withOpacity(.4),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              Text(
+                                prediction.category,
+                                style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                    color: Colors.white),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 2),
+                          decoration: const BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              color: Colors.white,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(10))),
+                          child: Text(
+                            prediction.score.toString() + "%",
+                            style: const TextStyle(
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400,
+                                color: Colors.black),
+                          ),
+                        )
+                      ],
+                    ),
+                    left: 10,
+                    bottom: 10,
+                    right: 15,
+                  )
+                ],
+              )),
+        ),
       ],
     );
   }
