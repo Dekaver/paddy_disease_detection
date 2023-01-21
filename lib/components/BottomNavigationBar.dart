@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-// import 'package:paddy_disease_detection/main.dart';
 
 class BottomNav extends StatefulWidget {
   final ThemeData appTheme;
